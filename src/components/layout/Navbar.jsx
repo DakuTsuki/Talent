@@ -18,8 +18,12 @@ export default function Navbar({
   setActiveTab, 
   currentLanguage, 
   setCurrentLanguage,
+  currentUser,
+  onSignOut,
   onOpenAuthModal,
-  onOpenPostJobModal
+  onOpenPostJobModal,
+  isAdminAuthenticated,
+  onExitAdmin
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -35,7 +39,7 @@ export default function Navbar({
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       {/* Top Banner / Audience Selector Bar */}
       <div className="bg-[#0E3D6E] text-white text-xs py-1.5 px-4 sm:px-8 flex justify-between items-center font-medium">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => setActiveTab('students')}
             className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded transition ${
@@ -59,19 +63,23 @@ export default function Navbar({
             <Briefcase className="w-3.5 h-3.5" />
             <span>For Employers & Companies</span>
           </button>
-          <span className="text-white/30 hidden sm:inline">|</span>
-          <button 
-            onClick={() => setActiveTab('admin')}
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded transition ${
-              activeTab === 'admin' 
-                ? 'bg-[#E5A812] text-slate-950 font-bold' 
-                : 'text-amber-300 hover:text-white'
-            }`}
-            title="Coordinator Matching Console"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E5A812] animate-pulse" />
-            <span>Admin Matchmaker</span>
-          </button>
+
+          {/* Secure Admin Badge - only visible when actually unlocked */}
+          {isAdminAuthenticated && (
+            <>
+              <span className="text-white/30">|</span>
+              <div className="flex items-center gap-1.5 bg-[#E5A812] text-slate-950 px-2 py-0.5 rounded-md font-bold text-[11px] shadow-xs">
+                <span>🔒 Coordinator Admin Mode</span>
+                <button
+                  onClick={onExitAdmin}
+                  className="ml-1 text-[10px] underline text-slate-900 hover:text-black font-extrabold"
+                  title="Lock and exit admin"
+                >
+                  Exit
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Language selector & quick hotline */}
@@ -174,7 +182,7 @@ export default function Navbar({
         </nav>
 
         {/* Action Buttons */}
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-2.5">
           {activeTab === 'employers' ? (
             <button
               onClick={onOpenPostJobModal}
@@ -183,22 +191,40 @@ export default function Navbar({
               <PlusCircle className="w-4 h-4" />
               <span>Post Student Job</span>
             </button>
+          ) : null}
+
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                  activeTab === 'dashboard' 
+                    ? 'bg-[#0E3D6E] text-white shadow-sm' 
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                }`}
+              >
+                <div className="w-5 h-5 rounded-full bg-[#E5A812] text-slate-950 text-[10px] flex items-center justify-center font-black">
+                  {currentUser.fullName ? currentUser.fullName[0].toUpperCase() : 'S'}
+                </div>
+                <span>{currentUser.fullName?.split(' ')[0] || 'My'} Portal</span>
+              </button>
+              <button
+                onClick={onSignOut}
+                className="px-2.5 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                title="Sign out of student account"
+              >
+                Sign Out
+              </button>
+            </div>
           ) : (
             <button
-              onClick={() => setActiveTab('dashboard')}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition"
+              onClick={onOpenAuthModal}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#0E3D6E] hover:bg-[#092b4f] text-white shadow-md hover:shadow-lg transition active:scale-[0.98]"
             >
-              <User className="w-4 h-4 text-[#0E3D6E]" />
-              <span>My Dashboard</span>
+              <User className="w-4 h-4 text-[#E5A812]" />
+              <span>Student Sign In</span>
             </button>
           )}
-
-          <button
-            onClick={onOpenAuthModal}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#0E3D6E] hover:bg-[#092b4f] text-white shadow-md hover:shadow-lg transition active:scale-[0.98]"
-          >
-            <span>Student Sign In</span>
-          </button>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -281,12 +307,29 @@ export default function Navbar({
           </div>
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <button
-              onClick={() => { onOpenAuthModal(); setIsMobileMenuOpen(false); }}
-              className="w-full py-2.5 rounded-xl font-bold bg-[#0E3D6E] text-white text-center text-sm shadow"
-            >
-              Student Log In / Register
-            </button>
+            {currentUser ? (
+              <div className="space-y-2">
+                <button
+                  onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
+                  className="w-full py-2.5 rounded-xl font-bold bg-[#0E3D6E] text-white text-center text-sm shadow"
+                >
+                  View My Dashboard ({currentUser.fullName?.split(' ')[0]})
+                </button>
+                <button
+                  onClick={() => { onSignOut(); setIsMobileMenuOpen(false); }}
+                  className="w-full py-2 rounded-xl font-bold bg-rose-50 text-rose-700 text-center text-xs border border-rose-200"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { onOpenAuthModal(); setIsMobileMenuOpen(false); }}
+                className="w-full py-2.5 rounded-xl font-bold bg-[#0E3D6E] text-white text-center text-sm shadow"
+              >
+                Student Log In / Register
+              </button>
+            )}
             <button
               onClick={() => { onOpenPostJobModal(); setIsMobileMenuOpen(false); }}
               className="w-full py-2.5 rounded-xl font-bold bg-slate-100 text-[#0E3D6E] text-center text-sm"

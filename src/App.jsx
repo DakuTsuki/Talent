@@ -14,6 +14,7 @@ import EmployersView from './pages/EmployersView';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AuthModal from './components/common/AuthModal';
+import AdminAuthModal from './components/common/AdminAuthModal';
 import PostJobModal from './components/common/PostJobModal';
 import GoogleTranslateBanner from './components/common/GoogleTranslateBanner';
 import { MOCK_JOBS } from './data/mockJobs';
@@ -26,11 +27,51 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('students'); // 'students' | 'jobs' | 'calculator' | 'how-it-works' | 'employers' | 'dashboard' | 'faq'
   const [currentLanguage, setCurrentLanguage] = useState('en');
 
+  // Authenticated Student User
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('talent_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Admin Security State
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return sessionStorage.getItem('talent_admin_auth') === 'true';
+  });
+  const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = useState(false);
+
   // Modals
   const [selectedJobForModal, setSelectedJobForModal] = useState(null);
   const [selectedJobForApply, setSelectedJobForApply] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+
+  const handleLoginSuccess = (userProfile) => {
+    setCurrentUser(userProfile);
+    localStorage.setItem('talent_auth_user', JSON.stringify(userProfile));
+    setActiveTab('dashboard');
+  };
+
+  const handleSignOut = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('talent_auth_user');
+    setActiveTab('students');
+  };
+
+  const handleAdminAuthenticated = () => {
+    setIsAdminAuthenticated(true);
+    sessionStorage.setItem('talent_admin_auth', 'true');
+    setActiveTab('admin');
+  };
+
+  const handleExitAdmin = () => {
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem('talent_admin_auth');
+    setActiveTab('students');
+  };
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -172,21 +213,45 @@ export default function App() {
         setActiveTab={setActiveTab}
         currentLanguage={currentLanguage}
         setCurrentLanguage={setCurrentLanguage}
+        currentUser={currentUser}
+        onSignOut={handleSignOut}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenPostJobModal={() => setIsPostJobModalOpen(true)}
+        isAdminAuthenticated={isAdminAuthenticated}
+        onExitAdmin={handleExitAdmin}
       />
 
       {/* Main View Router */}
       <main className="flex-1">
         {activeTab === 'admin' ? (
-          /* Admin Matchmaker Console */
-          <AdminDashboard />
+          isAdminAuthenticated ? (
+            <AdminDashboard />
+          ) : (
+            <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 text-center space-y-4 shadow-md">
+              <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center mx-auto text-xl">
+                🔒
+              </div>
+              <h3 className="text-xl font-black text-slate-900">Restricted Coordinator Access</h3>
+              <p className="text-xs text-slate-500">
+                This console is protected for Talent school cooperative staff. Please enter your coordinator passkey to continue.
+              </p>
+              <button
+                onClick={() => setIsAdminAuthModalOpen(true)}
+                className="w-full py-2.5 rounded-xl font-bold bg-[#0E3D6E] text-white text-xs shadow-sm"
+              >
+                Enter Coordinator Passkey
+              </button>
+            </div>
+          )
         ) : activeTab === 'employers' ? (
           /* B2B Employers Page */
           <EmployersView onOpenPostJobModal={() => setIsPostJobModalOpen(true)} />
         ) : activeTab === 'dashboard' ? (
           /* Student Dashboard */
           <StudentDashboard 
+            currentUser={currentUser}
+            onSignOut={handleSignOut}
+            onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onSelectJob={setSelectedJobForModal} 
             appliedJobs={appliedJobs} 
           />
@@ -290,7 +355,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer setActiveTab={setActiveTab} />
+      <Footer 
+        setActiveTab={setActiveTab} 
+        onOpenAdminAuth={() => setIsAdminAuthModalOpen(true)}
+      />
 
       {/* Modals */}
       <JobDetailModal
@@ -311,6 +379,13 @@ export default function App() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      <AdminAuthModal
+        isOpen={isAdminAuthModalOpen}
+        onClose={() => setIsAdminAuthModalOpen(false)}
+        onAuthenticated={handleAdminAuthenticated}
       />
 
       <PostJobModal

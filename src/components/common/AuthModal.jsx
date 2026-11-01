@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, GraduationCap, Mail, Lock, User, ArrowRight, ShieldCheck } from 'lucide-react';
 import TalentLogo from './TalentLogo';
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +13,26 @@ export default function AuthModal({ isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(isRegister ? 'Registration successful! Welcome to Talent.' : 'Logged in successfully!');
+
+    // Derive name from email if signing in without full name
+    const derivedName = fullName.trim() 
+      ? fullName.trim() 
+      : email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+    const userProfile = {
+      id: `stud-${Date.now()}`,
+      fullName: derivedName,
+      email: email.trim(),
+      university: university.trim() || 'Budapest University of Technology & Economics (BME)',
+      studentId: `#TL-${Math.floor(10000 + Math.random() * 90000)}`,
+      isUnder25: true,
+      registeredAt: new Date().toISOString()
+    };
+
+    if (onLoginSuccess) {
+      onLoginSuccess(userProfile);
+    }
+
     onClose();
   };
 
@@ -32,12 +51,12 @@ export default function AuthModal({ isOpen, onClose }) {
           <div className="text-center space-y-2">
             <TalentLogo size="small" className="justify-center" />
             <h3 className="text-2xl font-black text-slate-900">
-              {isRegister ? 'Join Talent Cooperative' : 'Welcome Back'}
+              {isRegister ? 'Join Talent Cooperative' : 'Student Sign In'}
             </h3>
             <p className="text-xs text-slate-500">
               {isRegister
                 ? 'Sign up to unlock 100% tax-free student jobs and 1-click applications'
-                : 'Log in to track your shifts, payslips, and job applications'}
+                : 'Log in to manage your student profile, tracked applications, and contracts'}
             </p>
           </div>
 
@@ -45,7 +64,7 @@ export default function AuthModal({ isOpen, onClose }) {
             {isRegister && (
               <>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Full Name</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Full Legal Name *</label>
                   <div className="relative">
                     <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
@@ -60,7 +79,7 @@ export default function AuthModal({ isOpen, onClose }) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">University / College</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">University / College *</label>
                   <div className="relative">
                     <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
@@ -77,13 +96,13 @@ export default function AuthModal({ isOpen, onClose }) {
             )}
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Student Email Address *</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="email"
                   required
-                  placeholder="student@university.edu"
+                  placeholder="student@university.hu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
@@ -92,7 +111,7 @@ export default function AuthModal({ isOpen, onClose }) {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">Password</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Password *</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
@@ -110,7 +129,7 @@ export default function AuthModal({ isOpen, onClose }) {
               type="submit"
               className="w-full py-3 rounded-xl font-bold bg-[#0E3D6E] hover:bg-[#092b4f] text-white text-sm transition shadow-md flex items-center justify-center gap-2"
             >
-              <span>{isRegister ? 'Create Free Student Account' : 'Sign In'}</span>
+              <span>{isRegister ? 'Create Free Student Account' : 'Sign In to Dashboard'}</span>
               <ArrowRight className="w-4 h-4 text-[#E5A812]" />
             </button>
           </form>

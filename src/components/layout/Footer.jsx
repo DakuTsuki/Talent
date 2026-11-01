@@ -1,8 +1,8 @@
 import React from 'react';
 import TalentLogo from '../common/TalentLogo';
-import { Mail, Phone, MapPin, Send, ShieldCheck, Heart } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, ShieldCheck, Heart, Lock } from 'lucide-react';
 
-export default function Footer({ setActiveTab }) {
+export default function Footer({ setActiveTab, onOpenAdminAuth }) {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -124,12 +124,19 @@ export default function Footer({ setActiveTab }) {
           <div>
             © {new Date().getFullYear()} TALENT Iskolaszövetkezet (School Cooperative). All rights reserved.
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <span className="hover:text-slate-400 cursor-pointer">Privacy Policy (GDPR)</span>
             <span>•</span>
             <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
             <span>•</span>
-            <span className="hover:text-slate-400 cursor-pointer">Cooperative Bylaws</span>
+            <button 
+              onClick={onOpenAdminAuth}
+              className="text-slate-500 hover:text-[#E5A812] transition flex items-center gap-1 cursor-pointer font-medium"
+              title="Restricted coordinator access"
+            >
+              <Lock className="w-3 h-3" />
+              <span>Staff & Coordinator Access</span>
+            </button>
           </div>
         </div>
       </div>
