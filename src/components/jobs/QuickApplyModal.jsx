@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Upload, CheckCircle2, GraduationCap, Calendar, Phone, Mail, User, Sparkles } from 'lucide-react';
+import { api } from '../../services/api';
 
 export default function QuickApplyModal({ job, onClose, onSubmitSuccess }) {
   const [step, setStep] = useState(1);
@@ -40,16 +41,25 @@ export default function QuickApplyModal({ job, onClose, onSubmitSuccess }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      if (onSubmitSuccess) {
-        onSubmitSuccess({ job, ...formData });
-      }
-    }, 900);
+    try {
+      const payload = {
+        ...formData,
+        job: job ? { id: job.id, title: job.title, company: job.company } : null,
+        skills: job ? [job.category, 'English'] : ['General']
+      };
+      await api.submitApplication(payload);
+    } catch (err) {
+      console.warn('API submission fallback:', err);
+    }
+
+    setIsSubmitting(false);
+    setIsSuccess(true);
+    if (onSubmitSuccess) {
+      onSubmitSuccess({ job, ...formData });
+    }
   };
 
   return (

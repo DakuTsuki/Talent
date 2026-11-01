@@ -59,6 +59,19 @@ export default function Navbar({
             <Briefcase className="w-3.5 h-3.5" />
             <span>For Employers & Companies</span>
           </button>
+          <span className="text-white/30 hidden sm:inline">|</span>
+          <button 
+            onClick={() => setActiveTab('admin')}
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded transition ${
+              activeTab === 'admin' 
+                ? 'bg-[#E5A812] text-slate-950 font-bold' 
+                : 'text-amber-300 hover:text-white'
+            }`}
+            title="Coordinator Matching Console"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E5A812] animate-pulse" />
+            <span>Admin Matchmaker</span>
+          </button>
         </div>
 
         {/* Language selector & quick hotline */}

@@ -12,6 +12,7 @@ import {
   Building,
   Sparkles
 } from 'lucide-react';
+import { api } from '../services/api';
 
 export default function EmployersView({ onOpenPostJobModal }) {
   const [formData, setFormData] = useState({
@@ -25,8 +26,17 @@ export default function EmployersView({ onOpenPostJobModal }) {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await api.submitCompanyRequest({
+        ...formData,
+        roleNeeded: formData.jobCategory,
+        skillsRequired: [formData.jobCategory, 'English Friendly']
+      });
+    } catch (err) {
+      console.warn('API submission error:', err);
+    }
     setSubmitted(true);
   };
 

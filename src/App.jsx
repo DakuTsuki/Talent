@@ -12,6 +12,7 @@ import JobDetailModal from './components/jobs/JobDetailModal';
 import QuickApplyModal from './components/jobs/QuickApplyModal';
 import EmployersView from './pages/EmployersView';
 import StudentDashboard from './pages/StudentDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import AuthModal from './components/common/AuthModal';
 import PostJobModal from './components/common/PostJobModal';
 import GoogleTranslateBanner from './components/common/GoogleTranslateBanner';
@@ -177,7 +178,10 @@ export default function App() {
 
       {/* Main View Router */}
       <main className="flex-1">
-        {activeTab === 'employers' ? (
+        {activeTab === 'admin' ? (
+          /* Admin Matchmaker Console */
+          <AdminDashboard />
+        ) : activeTab === 'employers' ? (
           /* B2B Employers Page */
           <EmployersView onOpenPostJobModal={() => setIsPostJobModalOpen(true)} />
         ) : activeTab === 'dashboard' ? (
