@@ -18,7 +18,8 @@ const INITIAL_LOCAL_DATA = {
       availability: ['Morning Shifts', 'Weekdays'],
       preferredLocations: ['Budapest', 'Remote'],
       registeredAt: '2026-10-24T10:00:00Z',
-      status: 'Active'
+      status: 'Active',
+      approvalStatus: 'Approved'
     },
     {
       id: 'stud-102',
@@ -32,7 +33,8 @@ const INITIAL_LOCAL_DATA = {
       availability: ['Afternoon Shifts', 'Evenings', 'Flexible'],
       preferredLocations: ['Budapest', 'Remote'],
       registeredAt: '2026-10-26T14:30:00Z',
-      status: 'Active'
+      status: 'Active',
+      approvalStatus: 'Approved'
     },
     {
       id: 'stud-103',
@@ -46,7 +48,8 @@ const INITIAL_LOCAL_DATA = {
       availability: ['Night Shifts', 'Weekends'],
       preferredLocations: ['Győr', 'Budapest'],
       registeredAt: '2026-10-27T09:15:00Z',
-      status: 'Active'
+      status: 'Active',
+      approvalStatus: 'Pending'
     },
     {
       id: 'stud-104',
@@ -60,7 +63,8 @@ const INITIAL_LOCAL_DATA = {
       availability: ['Weekends Only', 'Morning Shifts'],
       preferredLocations: ['Debrecen', 'Budapest'],
       registeredAt: '2026-10-28T16:00:00Z',
-      status: 'Active'
+      status: 'Active',
+      approvalStatus: 'Approved'
     }
   ],
   applications: [
@@ -154,7 +158,12 @@ const INITIAL_LOCAL_DATA = {
       status: 'Candidate Sent',
       coordinatorNotes: 'Alex meets all React requirements. Waiting for final interview feedback.'
     }
-  ]
+  ],
+  adminSettings: {
+    sendApprovalEmail: true,
+    notifyAdminOnRequest: true,
+    emailSender: 'Talent School Cooperative <welcome@talent-jobs.hu>'
+  }
 };
 
 function getLocalData() {
@@ -226,7 +235,8 @@ export const localDB = {
         skills: appData.skills || ['General Student'],
         availability: appData.availableDays || ['Flexible'],
         registeredAt: new Date().toISOString(),
-        status: 'Active'
+        status: 'Active',
+        approvalStatus: 'Pending'
       };
       data.students.unshift(student);
     }
@@ -315,6 +325,29 @@ export const localDB = {
 
   getMatches() {
     return getLocalData().matches;
+  },
+
+  updateStudentApprovalStatus(studentId, status) {
+    const data = getLocalData();
+    const student = data.students.find(s => s.id === studentId);
+    if (student) {
+      student.approvalStatus = status;
+      saveLocalData(data);
+      return student;
+    }
+    return null;
+  },
+
+  getAdminSettings() {
+    const data = getLocalData();
+    return data.adminSettings || { sendApprovalEmail: true, notifyAdminOnRequest: true };
+  },
+
+  updateAdminSettings(newSettings) {
+    const data = getLocalData();
+    data.adminSettings = { ...(data.adminSettings || {}), ...newSettings };
+    saveLocalData(data);
+    return data.adminSettings;
   },
 
   getStats() {
