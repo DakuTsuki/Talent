@@ -1,5 +1,5 @@
-import { localDB } from './storageEngine';
-import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { localDB } from './storageEngine.js';
+import { supabase, isSupabaseConfigured } from './supabaseClient.js';
 
 const API_BASE = 'http://localhost:5000/api';
 
