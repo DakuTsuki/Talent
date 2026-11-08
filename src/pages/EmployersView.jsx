@@ -3,13 +3,11 @@ import {
   Briefcase, 
   TrendingDown, 
   Users, 
-  ShieldCheck, 
-  Zap, 
   FileText, 
   CheckCircle2, 
-  ArrowRight,
   Send,
-  Building,
+  PlusCircle,
+  Building2,
   Sparkles
 } from 'lucide-react';
 import { api } from '../services/api';
@@ -24,250 +22,233 @@ export default function EmployersView({ onOpenPostJobModal }) {
     headcount: '1-3 students',
     description: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await api.submitCompanyRequest({
         ...formData,
         roleNeeded: formData.jobCategory,
         skillsRequired: [formData.jobCategory, 'English Friendly']
       });
+      setSubmitted(true);
     } catch (err) {
       console.warn('API submission error:', err);
+      // Fallback show success
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
     }
-    setSubmitted(true);
   };
 
-  const advantages = [
-    {
-      icon: TrendingDown,
-      color: 'text-[#1E5E3A]',
-      bg: 'bg-emerald-50',
-      title: 'Zero Employer Payroll Taxes',
-      desc: 'No 13% social contribution tax (szocho) and no vocational training contribution. Save up to 25-35% on total staff costs.'
-    },
-    {
-      icon: Zap,
-      color: 'text-[#E5A812]',
-      bg: 'bg-amber-50',
-      title: '100% Flexible Capacity',
-      desc: 'Scale your team up or down based on seasonal peaks, project deadlines, or unexpected customer demand with zero severance risk.'
-    },
-    {
-      icon: FileText,
-      color: 'text-[#0E3D6E]',
-      bg: 'bg-blue-50',
-      title: 'Complete Paperless Administration',
-      desc: 'Talent Cooperative handles all student contracts, attendance sheets, medical checks, and payroll disbursement.'
-    },
-    {
-      icon: Users,
-      color: 'text-[#C92A2A]',
-      bg: 'bg-red-50',
-      title: 'Pipeline to Future Graduates',
-      desc: 'Train university students during their studies and smoothly transition top performers into full-time roles upon graduation.'
-    }
-  ];
-
   return (
-    <div className="space-y-16 py-8">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0E3D6E] via-[#0b3158] to-[#071f38] text-white py-16 sm:py-24 rounded-3xl mx-4 sm:mx-8 px-6 sm:px-12 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#8DB828]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 left-10 w-96 h-96 bg-[#E5A812]/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#8DB828] text-slate-950 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            B2B Student Workforce Solutions
-          </span>
-
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Hire Motivated Student Talent with <br />
-            <span className="text-[#E5A812]">Zero Administrative Headache.</span>
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      {/* Clean Company Hero */}
+      <div className="bg-gradient-to-br from-[#0E3D6E] to-[#072442] text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="space-y-3 max-w-xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#8DB828] text-slate-950">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Corporate & Employer Portal</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+            Hire Motivated Student Talent with <span className="text-[#E5A812]">Zero Payroll Tax</span>
           </h1>
-
-          <p className="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto">
-            Leverage Hungary's most advantageous labor framework. Tap into 1,200+ top university students for IT, retail, customer care, and logistics with instant deployment.
+          <p className="text-xs sm:text-sm text-slate-200">
+            School cooperative employment is 100% exempt from the 13% employer social contribution tax (szocho). Talent Cooperative manages contracts, legalities, and payroll.
           </p>
+        </div>
 
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+        <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto">
+          <button
+            onClick={onOpenPostJobModal}
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-black text-xs sm:text-sm bg-[#1E5E3A] hover:bg-[#16482d] text-white shadow-md transition active:scale-95"
+          >
+            <PlusCircle className="w-4 h-4 text-[#8DB828]" />
+            <span>+ Post a Job Directly</span>
+          </button>
+          <a
+            href="#staffing-form"
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-black text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition text-center"
+          >
+            <span>Request Staffing Quote</span>
+          </a>
+        </div>
+      </div>
+
+      {/* 3 Core Highlights */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#1E5E3A] flex items-center justify-center shrink-0">
+            <TrendingDown className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-slate-900">0% Szocho Tax</h3>
+            <p className="text-xs text-slate-500 mt-0.5">Save 25-35% on total employment costs legally under Hungarian school coop law.</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0E3D6E] flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-slate-900">Zero Paperwork</h3>
+            <p className="text-xs text-slate-500 mt-0.5">We handle all student employment contracts, attendance, and payroll disbursement.</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#C92A2A] flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-slate-900">Fast Placement</h3>
+            <p className="text-xs text-slate-500 mt-0.5">Access over 1,200 active university students across Budapest, Debrecen, and Szeged.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Clean Staffing Request Form */}
+      <div id="staffing-form" className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-lg space-y-6">
+        <div className="border-b border-slate-100 pb-3">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900">Request Student Staffing</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Fill in your basic requirement below and our corporate coordinator will contact you with availability and rates.
+          </p>
+        </div>
+
+        {submitted ? (
+          <div className="p-8 text-center space-y-3 bg-emerald-50 rounded-2xl border border-emerald-200">
+            <CheckCircle2 className="w-10 h-10 text-[#1E5E3A] mx-auto" />
+            <h4 className="text-lg font-bold text-slate-900">Staffing Request Received!</h4>
+            <p className="text-xs text-slate-600 max-w-sm mx-auto">
+              Thank you! Your request has been recorded in the Talent cooperative system. Our team will contact you shortly.
+            </p>
             <button
               onClick={() => {
-                document.getElementById('b2b-form')?.scrollIntoView({ behavior: 'smooth' });
+                setSubmitted(false);
+                setFormData({
+                  companyName: '',
+                  contactPerson: '',
+                  email: '',
+                  phone: '',
+                  jobCategory: 'IT & Software',
+                  headcount: '1-3 students',
+                  description: ''
+                });
               }}
-              className="px-6 py-3.5 rounded-2xl font-bold bg-[#E5A812] hover:bg-[#c9930f] text-slate-950 shadow-lg hover:shadow-xl transition flex items-center gap-2"
+              className="mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0E3D6E] text-white"
             >
-              <span>Request Student Staff</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={onOpenPostJobModal}
-              className="px-6 py-3.5 rounded-2xl font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition"
-            >
-              Post a Position Direct
+              Submit Another Request
             </button>
           </div>
-        </div>
-      </section>
-
-      {/* 4 Core Employer Benefits */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-            Why Hundreds of Enterprises Partner with Talent
-          </h2>
-          <p className="text-sm text-slate-600">
-            School cooperative staffing offers legal, financial, and operational benefits unmatched by standard employment agencies.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {advantages.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div 
-                key={idx} 
-                className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition space-y-3"
-              >
-                <div className={`w-12 h-12 rounded-xl ${item.bg} ${item.color} flex items-center justify-center`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900">{item.title}</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Fast Quote / Request Form */}
-      <section id="b2b-form" className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="text-2xl font-black text-slate-900">Get a Fast Student Staffing Quote</h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Tell us your staffing requirements. Our corporate account manager will reply within 2 business hours.
-            </p>
-          </div>
-
-          {submitted ? (
-            <div className="p-8 text-center space-y-3 bg-emerald-50 rounded-2xl border border-emerald-200">
-              <CheckCircle2 className="w-12 h-12 text-[#1E5E3A] mx-auto" />
-              <h4 className="text-xl font-bold text-slate-900">Quote Request Received!</h4>
-              <p className="text-sm text-slate-600 max-w-sm mx-auto">
-                Thank you! Our dedicated enterprise consultant is preparing a personalized rate card and student availability estimate.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Company Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Acme Logistics Kft."
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Contact Person *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full name & title"
-                    value={formData.contactPerson}
-                    onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Corporate Email *</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="hr@company.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="+36 1 234 5678"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Category Needed</label>
-                  <select
-                    value={formData.jobCategory}
-                    onChange={(e) => setFormData({ ...formData, jobCategory: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  >
-                    <option value="IT & Software">IT & Software</option>
-                    <option value="Admin & Office">Admin & Office</option>
-                    <option value="Retail & Merchandising">Retail & Merchandising</option>
-                    <option value="Warehouse & Logistics">Warehouse & Logistics</option>
-                    <option value="Hospitality & Events">Hospitality & Events</option>
-                    <option value="Customer Support">Customer Support</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Number of Students Needed</label>
-                  <select
-                    value={formData.headcount}
-                    onChange={(e) => setFormData({ ...formData, headcount: e.target.value })}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
-                  >
-                    <option value="1-3 students">1-3 students</option>
-                    <option value="4-10 students">4-10 students</option>
-                    <option value="10-30 students">10-30 students (Seasonal project)</option>
-                    <option value="30+ students">30+ students (Enterprise volume)</option>
-                  </select>
-                </div>
-              </div>
-
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Brief Description of the Task</label>
-                <textarea
-                  rows={3}
-                  placeholder="e.g. We require 4 university students for warehouse order picking during night shifts in Győr..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                <label className="text-xs font-bold text-slate-700 block mb-1">Company Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Continental Kft."
+                  value={formData.companyName}
+                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                   className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
                 />
               </div>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Contact Person *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Full name & title"
+                  value={formData.contactPerson}
+                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+                />
+              </div>
+            </div>
 
-              <button
-                type="submit"
-                className="w-full py-3.5 rounded-2xl font-bold bg-[#0E3D6E] hover:bg-[#082b4f] text-white transition text-sm shadow-md flex items-center justify-center gap-2"
-              >
-                <Send className="w-4 h-4 text-[#E5A812]" />
-                <span>Submit Staffing Request</span>
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="contact@company.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="+36 30 123 4567"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Job Category</label>
+                <select
+                  value={formData.jobCategory}
+                  onChange={(e) => setFormData({ ...formData, jobCategory: e.target.value })}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+                >
+                  <option value="IT & Software">IT & Software</option>
+                  <option value="Admin & Office">Admin & Office</option>
+                  <option value="Retail & Merchandising">Retail & Merchandising</option>
+                  <option value="Warehouse & Logistics">Warehouse & Logistics</option>
+                  <option value="Hospitality & Events">Hospitality & Events</option>
+                  <option value="Customer Support">Customer Support</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Headcount Needed</label>
+                <select
+                  value={formData.headcount}
+                  onChange={(e) => setFormData({ ...formData, headcount: e.target.value })}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+                >
+                  <option value="1-3 students">1-3 students</option>
+                  <option value="4-10 students">4-10 students</option>
+                  <option value="10+ students">10+ students</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Brief Description (Optional)</label>
+              <textarea
+                rows={3}
+                placeholder="Describe responsibilities, working hours, or language requirements..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#0E3D6E]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 rounded-xl font-black bg-[#0E3D6E] hover:bg-[#082b4f] text-white transition text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50"
+            >
+              <Send className="w-4 h-4 text-[#E5A812]" />
+              <span>{isSubmitting ? 'Submitting...' : 'Send Staffing Request'}</span>
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
