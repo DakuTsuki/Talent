@@ -1,8 +1,8 @@
 import React from 'react';
 import TalentLogo from '../common/TalentLogo';
-import { Mail, Phone, MapPin, Send, ShieldCheck, Heart, Lock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Lock } from 'lucide-react';
 
-export default function Footer({ setActiveTab, onOpenAdminAuth }) {
+export default function Footer({ setActiveTab, onNavigateAdmin }) {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -38,24 +38,17 @@ export default function Footer({ setActiveTab, onOpenAdminAuth }) {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => setActiveTab('jobs')} className="hover:text-white transition">
-                  Browse All Jobs
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('calculator')} className="hover:text-white transition">
-                  Student Wage Calculator
+                <button onClick={() => setActiveTab('students')} className="hover:text-white transition">
+                  Browse Student Jobs
                 </button>
               </li>
               <li>
                 <button onClick={() => setActiveTab('dashboard')} className="hover:text-white transition">
-                  Student Portal & Contracts
+                  Student Portal & Applications
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveTab('faq')} className="hover:text-white transition">
-                  SZJA Tax Exemption Guide
-                </button>
+                <span className="text-slate-500">0% Tax Exemption Under 25</span>
               </li>
               <li>
                 <span className="text-slate-500">International Students Hub</span>
@@ -86,9 +79,6 @@ export default function Footer({ setActiveTab, onOpenAdminAuth }) {
               </li>
               <li>
                 <span className="text-slate-500">Corporate Internship Programs</span>
-              </li>
-              <li>
-                <span className="text-slate-500">B2B Rate Card</span>
               </li>
             </ul>
           </div>
@@ -129,14 +119,18 @@ export default function Footer({ setActiveTab, onOpenAdminAuth }) {
             <span>•</span>
             <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
             <span>•</span>
-            <button 
-              onClick={onOpenAdminAuth}
-              className="text-slate-500 hover:text-[#E5A812] transition flex items-center gap-1 cursor-pointer font-medium"
-              title="Restricted coordinator access"
+            <a 
+              href="/admin"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateAdmin();
+              }}
+              className="text-slate-500 hover:text-[#E5A812] transition flex items-center gap-1 font-medium"
+              title="Staff coordination portal (/admin)"
             >
               <Lock className="w-3 h-3" />
               <span>Staff & Coordinator Access</span>
-            </button>
+            </a>
           </div>
         </div>
       </div>

@@ -22,8 +22,6 @@ export default function Navbar({
   onSignOut,
   onOpenAuthModal,
   onOpenPostJobModal,
-  isAdminAuthenticated,
-  onExitAdmin,
   isCalculatorOpen,
   onToggleCalculator
 }) {
@@ -107,19 +105,6 @@ export default function Navbar({
             </button>
           )}
 
-          {/* Admin Mode Badge if authenticated */}
-          {isAdminAuthenticated && (
-            <div className="flex items-center gap-1.5 bg-[#E5A812] text-slate-950 px-2.5 py-1.5 rounded-xl font-bold text-xs shadow-xs">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Admin Active</span>
-              <button
-                onClick={onExitAdmin}
-                className="ml-1 text-[10px] underline text-slate-900 hover:text-black font-black"
-              >
-                Exit
-              </button>
-            </div>
-          )}
 
           {/* Language selector */}
           <div className="relative">

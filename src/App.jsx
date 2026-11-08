@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
@@ -9,9 +9,8 @@ import JobDetailModal from './components/jobs/JobDetailModal';
 import QuickApplyModal from './components/jobs/QuickApplyModal';
 import EmployersView from './pages/EmployersView';
 import StudentDashboard from './pages/StudentDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminPage from './pages/AdminPage';
 import AuthModal from './components/common/AuthModal';
-import AdminAuthModal from './components/common/AdminAuthModal';
 import PostJobModal from './components/common/PostJobModal';
 import GoogleTranslateBanner from './components/common/GoogleTranslateBanner';
 import { MOCK_JOBS } from './data/mockJobs';
@@ -21,9 +20,28 @@ export default function App() {
   const [jobs, setJobs] = useState(MOCK_JOBS);
   const [savedJobIds, setSavedJobIds] = useState(new Set());
   const [appliedJobs, setAppliedJobs] = useState([]);
-  const [activeTab, setActiveTab] = useState('students'); // 'students' | 'employers' | 'dashboard' | 'admin'
+  const [activeTab, setActiveTab] = useState('students'); // 'students' | 'employers' | 'dashboard'
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+
+  // Path routing: detects (domain)/admin
+  const [currentPath, setCurrentPath] = useState(() => {
+    return window.location.pathname.toLowerCase();
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname.toLowerCase());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (path) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path.toLowerCase());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Authenticated Student User
   const [currentUser, setCurrentUser] = useState(() => {
@@ -34,12 +52,6 @@ export default function App() {
       return null;
     }
   });
-
-  // Admin Security State
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
-    return sessionStorage.getItem('talent_admin_auth') === 'true';
-  });
-  const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = useState(false);
 
   // Modals
   const [selectedJobForModal, setSelectedJobForModal] = useState(null);
@@ -56,18 +68,6 @@ export default function App() {
   const handleSignOut = () => {
     setCurrentUser(null);
     localStorage.removeItem('talent_auth_user');
-    setActiveTab('students');
-  };
-
-  const handleAdminAuthenticated = () => {
-    setIsAdminAuthenticated(true);
-    sessionStorage.setItem('talent_admin_auth', 'true');
-    setActiveTab('admin');
-  };
-
-  const handleExitAdmin = () => {
-    setIsAdminAuthenticated(false);
-    sessionStorage.removeItem('talent_admin_auth');
     setActiveTab('students');
   };
 
@@ -139,7 +139,6 @@ export default function App() {
   // Filtered Jobs
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
-      // Keyword
       if (filters.keyword.trim()) {
         const q = filters.keyword.toLowerCase();
         const matchesTitle = job.title.toLowerCase().includes(q);
@@ -148,37 +147,30 @@ export default function App() {
         if (!matchesTitle && !matchesCompany && !matchesDesc) return false;
       }
 
-      // Category
       if (filters.category !== 'all' && job.category !== filters.category) {
         return false;
       }
 
-      // City
       if (filters.city !== 'All Cities') {
         if (!job.location.toLowerCase().includes(filters.city.toLowerCase())) return false;
       }
 
-      // Min Wage
       if (job.hourlyRateHuf < filters.minWage) {
         return false;
       }
 
-      // English only
       if (filters.englishOnly && !job.isEnglishFriendly) {
         return false;
       }
 
-      // Under 18
       if (filters.under18 && !job.isUnder18) {
         return false;
       }
 
-      // Remote only
       if (filters.remoteOnly && !job.isRemote) {
         return false;
       }
 
-      // Shifts
       if (filters.shifts.length > 0) {
         const hasShift = filters.shifts.some(s => job.shifts.includes(s));
         if (!hasShift) return false;
@@ -196,6 +188,12 @@ export default function App() {
     setAppliedJobs([applicationData, ...appliedJobs]);
   };
 
+  // 1. If path is /admin or /admin/, render the dedicated Staff Coordination Portal
+  if (currentPath === '/admin' || currentPath === '/admin/') {
+    return <AdminPage onNavigateHome={() => navigateTo('/')} />;
+  }
+
+  // 2. Default Public Portal (Students & Companies)
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
       {/* Multilingual / Google Translate Banner */}
@@ -204,7 +202,7 @@ export default function App() {
         onLanguageChange={setCurrentLanguage} 
       />
 
-      {/* Main Clean Navbar with prominent Student & Company buttons */}
+      {/* Main Clean Navbar with Student & Company buttons */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -214,35 +212,13 @@ export default function App() {
         onSignOut={handleSignOut}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenPostJobModal={() => setIsPostJobModalOpen(true)}
-        isAdminAuthenticated={isAdminAuthenticated}
-        onExitAdmin={handleExitAdmin}
         isCalculatorOpen={isCalculatorOpen}
         onToggleCalculator={() => setIsCalculatorOpen(!isCalculatorOpen)}
       />
 
       {/* Main View Router */}
       <main className="flex-1">
-        {activeTab === 'admin' ? (
-          isAdminAuthenticated ? (
-            <AdminDashboard />
-          ) : (
-            <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 text-center space-y-4 shadow-md">
-              <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center mx-auto text-xl">
-                🔒
-              </div>
-              <h3 className="text-xl font-black text-slate-900">Restricted Coordinator Access</h3>
-              <p className="text-xs text-slate-500">
-                This console is protected for Talent school cooperative staff. Please enter your coordinator passkey to continue.
-              </p>
-              <button
-                onClick={() => setIsAdminAuthModalOpen(true)}
-                className="w-full py-2.5 rounded-xl font-bold bg-[#0E3D6E] text-white text-xs shadow-sm"
-              >
-                Enter Coordinator Passkey
-              </button>
-            </div>
-          )
-        ) : activeTab === 'employers' ? (
+        {activeTab === 'employers' ? (
           /* B2B Company View */
           <EmployersView onOpenPostJobModal={() => setIsPostJobModalOpen(true)} />
         ) : activeTab === 'dashboard' ? (
@@ -280,7 +256,7 @@ export default function App() {
               </section>
             )}
 
-            {/* Live Student Jobs Section - Immediately Visible */}
+            {/* Live Student Jobs Section */}
             <section id="jobs-section" className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-6 gap-3">
                 <div>
@@ -345,10 +321,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Clean Footer with Coordinator Passkey Lock */}
+      {/* Clean Footer with Staff Coordination Portal link to /admin */}
       <Footer 
         setActiveTab={setActiveTab} 
-        onOpenAdminAuth={() => setIsAdminAuthModalOpen(true)}
+        onNavigateAdmin={() => navigateTo('/admin')}
       />
 
       {/* Modals */}
@@ -371,12 +347,6 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
-      />
-
-      <AdminAuthModal
-        isOpen={isAdminAuthModalOpen}
-        onClose={() => setIsAdminAuthModalOpen(false)}
-        onAuthenticated={handleAdminAuthenticated}
       />
 
       <PostJobModal
