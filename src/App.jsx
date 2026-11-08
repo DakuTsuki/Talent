@@ -321,11 +321,8 @@ export default function App() {
         )}
       </main>
 
-      {/* Clean Footer with Staff Coordination Portal link to /admin */}
-      <Footer 
-        setActiveTab={setActiveTab} 
-        onNavigateAdmin={() => navigateTo('/admin')}
-      />
+      {/* Clean Footer */}
+      <Footer setActiveTab={setActiveTab} />
 
       {/* Modals */}
       <JobDetailModal

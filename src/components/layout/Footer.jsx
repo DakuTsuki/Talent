@@ -1,8 +1,8 @@
 import React from 'react';
 import TalentLogo from '../common/TalentLogo';
-import { Mail, Phone, MapPin, Send, Lock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
-export default function Footer({ setActiveTab, onNavigateAdmin }) {
+export default function Footer({ setActiveTab }) {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -118,19 +118,6 @@ export default function Footer({ setActiveTab, onNavigateAdmin }) {
             <span className="hover:text-slate-400 cursor-pointer">Privacy Policy (GDPR)</span>
             <span>•</span>
             <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
-            <span>•</span>
-            <a 
-              href="/admin"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateAdmin();
-              }}
-              className="text-slate-500 hover:text-[#E5A812] transition flex items-center gap-1 font-medium"
-              title="Staff coordination portal (/admin)"
-            >
-              <Lock className="w-3 h-3" />
-              <span>Staff & Coordinator Access</span>
-            </a>
           </div>
         </div>
       </div>
